@@ -8,9 +8,11 @@ import io.vertx.core.Vertx;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) {
-        log.debug("started");
+        log.debug("verticles deployment started");
 
         var vertx = Vertx.vertx();
-        vertx.deployVerticle(new FirstVerticle());
+        vertx.deployVerticle(new SupervisorVerticle());
+
+        log.debug("exiting...");
     }
 }
