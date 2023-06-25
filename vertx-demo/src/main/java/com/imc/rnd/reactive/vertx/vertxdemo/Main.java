@@ -1,9 +1,16 @@
 package com.imc.rnd.reactive.vertx.vertxdemo;
 
-import static java.lang.System.out;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.vertx.core.Vertx;
 
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) {
-        out.println("started");
+        log.debug("started");
+
+        var vertx = Vertx.vertx();
+        vertx.deployVerticle(new FirstVerticle());
     }
 }
