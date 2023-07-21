@@ -16,24 +16,39 @@ public class SupervisorVerticle extends AbstractVerticle {
         vertx.deployVerticle(new ConsoleVerticle(), consoleDeploymentResult -> {
             if (consoleDeploymentResult.succeeded()) {
                 var consoleVerticleId = consoleDeploymentResult.result();
-                log.debug("console verticle deployment completed - deployment id: {}", consoleVerticleId);
+                log.debug("console started - console id: {}", consoleVerticleId);
 
                 vertx.deployVerticle(new TerminalVerticle(), terminalDeploymentResult -> {
                     if (terminalDeploymentResult.succeeded()) {
                         var terminalVerticleId = terminalDeploymentResult.result();
-                        log.debug("terminal verticle deployment completed - deployment id: {}", terminalVerticleId);
+                        log.debug("terminal started - terminal id: {}", terminalVerticleId);
 
-                        log.debug("system initialization completed");
+                        log.debug("all devices started");
+
+                        var systemId = deploymentID();
+                        vertx.setTimer(5000, tid -> {
+                            vertx.undeploy(systemId);
+                        });
+
                         startPromise.complete();
                     } else {
-                        log.error("terminal verticle deployment failed: ", terminalDeploymentResult.cause());
+                        log.error("terminal start failed: ", terminalDeploymentResult.cause());
                         startPromise.fail(terminalDeploymentResult.cause());
                     }
                 });
             } else {
-                log.error("console verticle deployment failed: ", consoleDeploymentResult.cause());
+                log.error("console start failed: ", consoleDeploymentResult.cause());
                 startPromise.fail(consoleDeploymentResult.cause());
             }
         });
+    }
+
+    @Override
+    public void stop(Promise<Void> stopPromise) {
+        log.debug("system stopped");
+        stopPromise.complete(null);
+
+        log.debug("closing Vert.x");
+        vertx.close();
     }
 }
